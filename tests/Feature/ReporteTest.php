@@ -32,12 +32,13 @@ class ReporteTest extends TestCase
             ->assertSee('Todavía no hay informes');
     }
 
-    public function test_el_formulario_tiene_las_tres_secciones(): void
+    public function test_el_formulario_tiene_todas_las_secciones(): void
     {
         $this->get('/reportes/create')
             ->assertOk()
             ->assertSee('Progreso')
             ->assertSee('Problemas y soluciones')
+            ->assertSee('Riesgos')
             ->assertSee('Próximos pasos');
     }
 
@@ -54,10 +55,11 @@ class ReporteTest extends TestCase
                     'impacto' => 'alto',
                     'estado' => 'abierto',
                     'solucion_propuesta' => 'Reunión con el restaurante piloto',
+                    'solucion_implementada' => '',
                     'responsable' => 'Líder de proyecto',
                     'fecha_compromiso' => '2026-12-02',
                 ],
-                ['descripcion' => '', 'impacto' => 'medio', 'estado' => 'abierto', 'solucion_propuesta' => '', 'responsable' => '', 'fecha_compromiso' => ''],
+                ['descripcion' => '', 'impacto' => 'medio', 'estado' => 'abierto', 'solucion_propuesta' => '', 'solucion_implementada' => '', 'responsable' => '', 'fecha_compromiso' => ''],
             ],
         ]));
 
@@ -80,6 +82,52 @@ class ReporteTest extends TestCase
         $this->assertDatabaseCount('reportes', 0);
     }
 
+    public function test_un_problema_resuelto_debe_indicar_la_solucion_implementada(): void
+    {
+        $this->post('/reportes', $this->datosValidos([
+            'problemas' => [
+                [
+                    'descripcion' => 'Las pruebas fallaban por la versión de PHP',
+                    'impacto' => 'medio',
+                    'estado' => 'resuelto',
+                    'solucion_propuesta' => 'Fijar la versión de PHP en Docker',
+                    'solucion_implementada' => '',
+                ],
+            ],
+        ]))->assertSessionHasErrors('problemas.0.solucion_implementada');
+
+        $this->assertDatabaseCount('reportes', 0);
+    }
+
+    public function test_guarda_un_riesgo_con_su_medida_preventiva(): void
+    {
+        $this->post('/reportes', $this->datosValidos([
+            'riesgos' => [
+                [
+                    'descripcion' => 'El restaurante podría no tener tiempo para validar',
+                    'probabilidad' => 'media',
+                    'impacto' => 'medio',
+                    'mitigacion' => 'Revisiones cortas de 15 minutos',
+                    'responsable' => 'Líder de proyecto',
+                ],
+                ['descripcion' => '', 'probabilidad' => 'media', 'impacto' => 'medio', 'mitigacion' => '', 'responsable' => ''],
+            ],
+        ]))->assertRedirect();
+
+        $this->assertDatabaseCount('riesgos', 1);
+    }
+
+    public function test_un_riesgo_sin_medida_preventiva_no_se_guarda(): void
+    {
+        $this->post('/reportes', $this->datosValidos([
+            'riesgos' => [
+                ['descripcion' => 'Un riesgo sin medida', 'probabilidad' => 'alta', 'impacto' => 'alto', 'mitigacion' => ''],
+            ],
+        ]))->assertSessionHasErrors('riesgos.0.mitigacion');
+
+        $this->assertDatabaseCount('reportes', 0);
+    }
+
     public function test_el_fin_del_periodo_no_puede_ser_anterior_al_inicio(): void
     {
         $this->post('/reportes', $this->datosValidos([
@@ -88,20 +136,29 @@ class ReporteTest extends TestCase
         ]))->assertSessionHasErrors('periodo_fin');
     }
 
-    public function test_el_informe_muestra_el_progreso_y_las_soluciones(): void
+    public function test_el_informe_muestra_el_progreso_las_soluciones_y_los_riesgos(): void
     {
         $reporte = Reporte::create($this->datosValidos());
         $reporte->avances()->create(['actividad' => 'Prototipos de pantallas', 'estado' => 'en_progreso']);
         $reporte->problemas()->create([
             'descripcion' => 'Los prototipos tardan en validarse',
             'impacto' => 'medio',
-            'estado' => 'abierto',
+            'estado' => 'resuelto',
             'solucion_propuesta' => 'Enviar tres preguntas concretas',
+            'solucion_implementada' => 'Se enviaron las preguntas y se recibió respuesta',
+        ]);
+        $reporte->riesgos()->create([
+            'descripcion' => 'Cambios en la operación del restaurante',
+            'probabilidad' => 'baja',
+            'impacto' => 'alto',
+            'mitigacion' => 'Revisar los indicadores en cada ciclo',
         ]);
 
         $this->get(route('reportes.show', $reporte))
             ->assertOk()
             ->assertSee('Prototipos de pantallas')
-            ->assertSee('Enviar tres preguntas concretas');
+            ->assertSee('Enviar tres preguntas concretas')
+            ->assertSee('Se enviaron las preguntas y se recibió respuesta')
+            ->assertSee('Revisar los indicadores en cada ciclo');
     }
 }

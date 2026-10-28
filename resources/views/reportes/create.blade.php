@@ -117,6 +117,10 @@
                         <label>Solución propuesta</label>
                         <textarea name="problemas[{{ $i }}][solucion_propuesta]" rows="2">{{ old("problemas.$i.solucion_propuesta") }}</textarea>
                     </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label>Solución implementada o resultado (si ya se aplicó)</label>
+                        <textarea name="problemas[{{ $i }}][solucion_implementada]" rows="2">{{ old("problemas.$i.solucion_implementada") }}</textarea>
+                    </div>
                     <div>
                         <label>Responsable</label>
                         <input name="problemas[{{ $i }}][responsable]" value="{{ old("problemas.$i.responsable") }}">
@@ -130,7 +134,44 @@
         </div>
 
         <div class="tarjeta">
-            <h2>4. Próximos pasos</h2>
+            <h2>4. Riesgos (opcional)</h2>
+            <p class="ayuda">Lo que podría salir mal más adelante. Cada riesgo debe llevar una medida preventiva. Las filas vacías se ignoran.</p>
+            @foreach (range(0, 1) as $i)
+                <div class="fila">
+                    <div style="grid-column: 1 / -1;">
+                        <label>Riesgo</label>
+                        <textarea name="riesgos[{{ $i }}][descripcion]" rows="2">{{ old("riesgos.$i.descripcion") }}</textarea>
+                    </div>
+                    <div>
+                        <label>Probabilidad</label>
+                        <select name="riesgos[{{ $i }}][probabilidad]">
+                            @foreach (\App\Models\Riesgo::PROBABILIDADES as $valor => $etiqueta)
+                                <option value="{{ $valor }}" @selected(old("riesgos.$i.probabilidad", 'media') === $valor)>{{ $etiqueta }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label>Impacto</label>
+                        <select name="riesgos[{{ $i }}][impacto]">
+                            @foreach (\App\Models\Riesgo::IMPACTOS as $valor => $etiqueta)
+                                <option value="{{ $valor }}" @selected(old("riesgos.$i.impacto", 'medio') === $valor)>{{ $etiqueta }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label>Medida preventiva</label>
+                        <textarea name="riesgos[{{ $i }}][mitigacion]" rows="2">{{ old("riesgos.$i.mitigacion") }}</textarea>
+                    </div>
+                    <div>
+                        <label>Responsable</label>
+                        <input name="riesgos[{{ $i }}][responsable]" value="{{ old("riesgos.$i.responsable") }}">
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <div class="tarjeta">
+            <h2>5. Próximos pasos</h2>
             <textarea name="proximos_pasos" rows="3" placeholder="Acciones concretas para el siguiente periodo, con responsable">{{ old('proximos_pasos') }}</textarea>
         </div>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('titulo') | NouriTech</title>
+    <title>@yield('titulo') | NouriTech FoodTech</title>
     <style>
         body { font-family: Calibri, Arial, sans-serif; margin: 0; color: #222; background: #f5f5f5; }
         header { background: #2f5d50; color: #fff; padding: 14px 24px; font-weight: bold; }
@@ -26,7 +26,7 @@
     </style>
 </head>
 <body>
-    <header>NouriTech · Informes de seguimiento</header>
+    <header>NouriTech FoodTech · Informes de seguimiento</header>
     <main>
         @if (session('ok'))
             <div class="aviso">{{ session('ok') }}</div>

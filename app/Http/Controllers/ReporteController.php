@@ -42,10 +42,16 @@ class ReporteController extends Controller
             ->values()
             ->all();
 
-        $reporte = DB::transaction(function () use ($datos, $avances, $problemas) {
-            $reporte = Reporte::create(Arr::except($datos, ['avances', 'problemas']));
+        $riesgos = collect($datos['riesgos'] ?? [])
+            ->filter(fn ($fila) => filled($fila['descripcion'] ?? null))
+            ->values()
+            ->all();
+
+        $reporte = DB::transaction(function () use ($datos, $avances, $problemas, $riesgos) {
+            $reporte = Reporte::create(Arr::except($datos, ['avances', 'problemas', 'riesgos']));
             $reporte->avances()->createMany($avances);
             $reporte->problemas()->createMany($problemas);
+            $reporte->riesgos()->createMany($riesgos);
 
             return $reporte;
         });
@@ -57,7 +63,7 @@ class ReporteController extends Controller
 
     public function show(Reporte $reporte)
     {
-        $reporte->load(['avances', 'problemas']);
+        $reporte->load(['avances', 'problemas', 'riesgos']);
 
         return view('reportes.show', compact('reporte'));
     }

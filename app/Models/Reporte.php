@@ -42,4 +42,9 @@ class Reporte extends Model
     {
         return $this->hasMany(Problema::class);
     }
+
+    public function riesgos(): HasMany
+    {
+        return $this->hasMany(Riesgo::class);
+    }
 }

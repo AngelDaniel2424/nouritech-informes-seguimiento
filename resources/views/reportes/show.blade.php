@@ -48,7 +48,7 @@
             @if ($loop->first)
                 <table>
                     <thead>
-                        <tr><th>Problema</th><th>Impacto</th><th>Estado</th><th>Solución propuesta</th><th>Responsable</th><th>Fecha compromiso</th></tr>
+                        <tr><th>Problema</th><th>Impacto</th><th>Estado</th><th>Solución propuesta</th><th>Solución implementada</th><th>Responsable</th><th>Fecha compromiso</th></tr>
                     </thead>
                     <tbody>
             @endif
@@ -57,6 +57,7 @@
                             <td>{{ \App\Models\Problema::IMPACTOS[$problema->impacto] ?? $problema->impacto }}</td>
                             <td>{{ \App\Models\Problema::ESTADOS[$problema->estado] ?? $problema->estado }}</td>
                             <td>{{ $problema->solucion_propuesta }}</td>
+                            <td>{{ $problema->solucion_implementada }}</td>
                             <td>{{ $problema->responsable }}</td>
                             <td>{{ optional($problema->fecha_compromiso)->format('d/m/Y') }}</td>
                         </tr>
@@ -66,6 +67,32 @@
             @endif
         @empty
             <p>No se reportaron problemas en este periodo.</p>
+        @endforelse
+    </div>
+
+    <div class="tarjeta">
+        <h2>Riesgos</h2>
+        @forelse ($reporte->riesgos as $riesgo)
+            @if ($loop->first)
+                <table>
+                    <thead>
+                        <tr><th>Riesgo</th><th>Probabilidad</th><th>Impacto</th><th>Medida preventiva</th><th>Responsable</th></tr>
+                    </thead>
+                    <tbody>
+            @endif
+                        <tr>
+                            <td>{{ $riesgo->descripcion }}</td>
+                            <td>{{ \App\Models\Riesgo::PROBABILIDADES[$riesgo->probabilidad] ?? $riesgo->probabilidad }}</td>
+                            <td>{{ \App\Models\Riesgo::IMPACTOS[$riesgo->impacto] ?? $riesgo->impacto }}</td>
+                            <td>{{ $riesgo->mitigacion }}</td>
+                            <td>{{ $riesgo->responsable }}</td>
+                        </tr>
+            @if ($loop->last)
+                    </tbody>
+                </table>
+            @endif
+        @empty
+            <p>No se registraron riesgos en este informe.</p>
         @endforelse
     </div>
 

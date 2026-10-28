@@ -27,6 +27,7 @@ class Problema extends Model
         'impacto',
         'estado',
         'solucion_propuesta',
+        'solucion_implementada',
         'responsable',
         'fecha_compromiso',
     ];

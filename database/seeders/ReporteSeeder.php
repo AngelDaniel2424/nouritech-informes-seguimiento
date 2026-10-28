@@ -13,6 +13,7 @@ class ReporteSeeder extends Seeder
 {
     public function run(): void
     {
+        // Informe completo: fase de diseño, con riesgos y un problema abierto.
         $informe4 = Reporte::create([
             'proyecto' => 'Food Waste Analytics',
             'periodo_inicio' => '2026-11-23',
@@ -52,6 +53,7 @@ class ReporteSeeder extends Seeder
                 'impacto' => 'alto',
                 'estado' => 'abierto',
                 'solucion_propuesta' => 'Hacer una reunión con el restaurante piloto y definir una lista corta de datos necesarios; probar con datos de ejemplo mientras tanto.',
+                'solucion_implementada' => null,
                 'responsable' => 'Líder de proyecto',
                 'fecha_compromiso' => '2026-12-02',
             ],
@@ -60,11 +62,30 @@ class ReporteSeeder extends Seeder
                 'impacto' => 'medio',
                 'estado' => 'en_proceso',
                 'solucion_propuesta' => 'Enviar los prototipos con tres preguntas concretas y pedir respuesta en dos días.',
+                'solucion_implementada' => 'Se enviaron los prototipos con las tres preguntas; falta la respuesta del restaurante.',
                 'responsable' => 'Analista y diseñador',
                 'fecha_compromiso' => '2026-11-30',
             ],
         ]);
 
+        $informe4->riesgos()->createMany([
+            [
+                'descripcion' => 'El restaurante piloto podría no tener tiempo para validar los prototipos a tiempo.',
+                'probabilidad' => 'media',
+                'impacto' => 'medio',
+                'mitigacion' => 'Hacer revisiones cortas de 15 minutos cada semana y enviar preguntas concretas por escrito.',
+                'responsable' => 'Líder de proyecto',
+            ],
+            [
+                'descripcion' => 'Un cambio en la operación del restaurante podría modificar los indicadores que se van a medir.',
+                'probabilidad' => 'baja',
+                'impacto' => 'alto',
+                'mitigacion' => 'Mantener el modelo de datos flexible y revisar los indicadores al terminar cada ciclo de desarrollo.',
+                'responsable' => 'Analista y diseñador',
+            ],
+        ]);
+
+        // Informe de desarrollo: problema con solución en proceso.
         $informe7 = Reporte::create([
             'proyecto' => 'Food Waste Analytics',
             'periodo_inicio' => '2026-12-14',
@@ -97,8 +118,39 @@ class ReporteSeeder extends Seeder
             'impacto' => 'medio',
             'estado' => 'en_proceso',
             'solucion_propuesta' => 'Reducir los campos obligatorios y dejar el motivo como lista de opciones.',
+            'solucion_implementada' => 'Se redujeron los campos obligatorios de seis a cuatro; falta probar el formulario nuevo.',
             'responsable' => 'Desarrollador de interfaz',
             'fecha_compromiso' => '2026-12-22',
+        ]);
+
+        // Informe corto de otro escenario: fase de pruebas, con un problema ya resuelto.
+        $informe13 = Reporte::create([
+            'proyecto' => 'Food Waste Analytics',
+            'periodo_inicio' => '2027-01-25',
+            'periodo_fin' => '2027-01-29',
+            'autor' => 'Responsable de calidad',
+            'fase_actual' => 'Pruebas (semana 13)',
+            'porcentaje_avance' => 82,
+            'estado_general' => 'verde',
+            'resumen' => 'Las pruebas de integración de la API pasaron en el entorno de pruebas después de corregir un problema de configuración.',
+            'proximos_pasos' => 'Hacer las pruebas con usuarios en el restaurante piloto (calidad y líder de proyecto).',
+        ]);
+
+        $informe13->avances()->create([
+            'actividad' => 'Pruebas de integración de la API',
+            'detalle' => 'Casos de registro de mermas y de cálculo de indicadores.',
+            'entregable' => 'Informe de pruebas',
+            'estado' => 'completado',
+        ]);
+
+        $informe13->problemas()->create([
+            'descripcion' => 'Las pruebas de la API fallaban en el entorno de pruebas por una versión distinta de PHP.',
+            'impacto' => 'medio',
+            'estado' => 'resuelto',
+            'solucion_propuesta' => 'Fijar la versión de PHP en la imagen de Docker.',
+            'solucion_implementada' => 'Se fijó la versión de PHP en el Dockerfile y se reconstruyeron los contenedores; las pruebas volvieron a pasar.',
+            'responsable' => 'Apoyo en infraestructura',
+            'fecha_compromiso' => '2027-01-27',
         ]);
     }
 }
