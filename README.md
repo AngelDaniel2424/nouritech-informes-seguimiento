@@ -144,5 +144,5 @@ Las pruebas revisan que el formulario tenga todas las secciones, que el informe 
 
 ## Responsables
 
-- Autor: _[nombre del estudiante]_
+- Autor: Arias Luna Angel Daniel
 - Contexto: actividad de Gestión de Proyectos (NouriTech FoodTech, Food Waste Analytics)
